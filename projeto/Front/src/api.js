@@ -1,23 +1,71 @@
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { createFormulario, getChecklistItens } from '../api/api';
 
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL + '/api/',
-});
-
-
-
-// Funções para consumir a API
-export const getFormularios = () => api.get('formularios/');
-export const createFormulario = (formulario) => api.post('formularios/', formulario);
-export const getChecklistItens = () => api.get('checklist-itens/');
-export const uploadCSV = (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return api.post('csv-files/', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
+const QualityForm = () => {
+    const [formulario, setFormulario] = useState({
+        nome: '',
+        checklist: [],
     });
+
+    const [checklistItens, setChecklistItens] = useState([]);
+
+    useEffect(() => {
+        // Buscar os itens do checklist ao carregar a página
+        getChecklistItens().then(response => {
+            setChecklistItens(response.data);
+        }).catch(error => console.error("Erro ao buscar checklist:", error));
+    }, []);
+
+    const handleChange = (e) => {
+        setFormulario({ ...formulario, [e.target.name]: e.target.value });
+    };
+
+    const handleChecklistChange = (e, itemId) => {
+        setFormulario(prevFormulario => {
+            const updatedChecklist = prevFormulario.checklist.includes(itemId)
+                ? prevFormulario.checklist.filter(id => id !== itemId) // Remove se já estiver marcado
+                : [...prevFormulario.checklist, itemId]; // Adiciona se não estiver marcado
+
+            return { ...prevFormulario, checklist: updatedChecklist };
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await createFormulario(formulario);
+            console.log("Formulário criado com sucesso:", response);
+        } catch (error) {
+            console.error("Erro ao enviar formulário:", error);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                name="nome"
+                value={formulario.nome}
+                onChange={handleChange}
+                placeholder="Nome do Formulário"
+                required
+            />
+
+            <h3>Checklist</h3>
+            {checklistItens.map((item) => (
+                <div key={item.id}>
+                    <input
+                        type="checkbox"
+                        checked={formulario.checklist.includes(item.id)}
+                        onChange={(e) => handleChecklistChange(e, item.id)}
+                    />
+                    <label>{item.descricao}</label>
+                </div>
+            ))}
+
+            <button type="submit">Enviar</button>
+        </form>
+    );
 };
 
-export default api;
+export default QualityForm;

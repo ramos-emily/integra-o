@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import img from "../componentes/imagens/bosch_logo.png"; // Importe a imagem aqui
 import logo from "../componentes/imagens/logo.png";
 
+
+
 export default function Login() {
     const navigate = useNavigate();
 

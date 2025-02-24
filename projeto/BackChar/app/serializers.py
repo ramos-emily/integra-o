@@ -7,7 +7,9 @@ class ChecklistItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class FormularioSerializer(serializers.ModelSerializer):
-    checklist = ChecklistItemSerializer(many=True, read_only=True)
+    checklist = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ChecklistItem.objects.all()
+    )
 
     class Meta:
         model = Formulario

@@ -13,10 +13,13 @@ from django.db.models import Avg
 import pandas as pd
 from .ai import sugerir_treinamentos, prever_erros_futuros
 
-# ViewSets para operações CRUD
 class FormularioViewSet(viewsets.ModelViewSet):
     queryset = Formulario.objects.all()
     serializer_class = FormularioSerializer
+
+    def perform_create(self, serializer):
+        formulario = serializer.save()
+        formulario.atualizar_percentual_conclusao()
 
 class ChecklistItemViewSet(viewsets.ModelViewSet):
     queryset = ChecklistItem.objects.all()
@@ -25,7 +28,6 @@ class ChecklistItemViewSet(viewsets.ModelViewSet):
 class CSVFileViewSet(viewsets.ModelViewSet):
     queryset = CSVFile.objects.all()
     serializer_class = CSVFileSerializer
-
 # Views normais para funcionalidades personalizadas
 def analise_view(request):
     # Chama as funções de IA
