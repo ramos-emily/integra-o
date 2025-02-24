@@ -3,6 +3,7 @@ import img from "../componentes/imagens/Bosch-Supergraphic_Stripe_RGB.png";
 import Footer from "../componentes/footer";
 import { Link, useNavigate } from 'react-router-dom';
 import Header from "../componentes/header";
+import axios from 'axios';
 
 export default function Quality() {
     const navigate = useNavigate();
@@ -19,30 +20,54 @@ export default function Quality() {
         checks_and_handling: [],
         taxonomy: []
     });
+    const [number, setNumber] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const [,] = useState('')
+    const token = localStorage.getItem('token')
 
     
+//VER AQUIIIIII!!!!!!!!
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
-            const response = await fetch('http://localhost:8000/api/formulario/', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:8000/api/quality-form/', 
+            {
+                number: number,
+                created= created,
+                country_of_request=data.get('country_of_request'),
+                assignment_group=data.get('assignment_group'),
+                assigned_to=data.get('assigned_to'),
+                state=data.get('state'),
+                channel=data.get('channel'),
+                additional_comments=data.get('additional_comments')
+            },
+            {
                 headers: {
-                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(formData),
             });
-
+    
             if (response.ok) {
                 const data = await response.json();
                 console.log('Resposta do backend:', data);
-                alert('Dados enviados com sucesso!');
+                alert('Formulário enviado com sucesso!');
             } else {
-                console.error('Erro ao enviar dados:', response.statusText);
+                const errorData = await response.json();
+                console.error('Erro ao enviar dados:', errorData.message);
+                alert('Erro ao enviar formulário: ' + errorData.message);
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
+            alert('Erro na requisição: ' + error.message);
         }
     };
 
@@ -55,18 +80,17 @@ export default function Quality() {
     };
 
     const handleCheckboxChange = (e) => {
-        const { name, checked } = e.target;
+        const { name, checked, value } = e.target;
         setFormData(prevState => {
             const updatedList = checked
-                ? [...prevState[name], e.target.value]
-                : prevState[name].filter(item => item !== e.target.value);
+                ? [...prevState[name], value]
+                : prevState[name].filter(item => item !== value);
             return {
                 ...prevState,
                 [name]: updatedList
             };
         });
     };
-
     return (
         <>
             <Header />
@@ -74,7 +98,7 @@ export default function Quality() {
                 <h1 className="mb-10">Quality Check</h1>
                 <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded-md w-full">
                     <div className="grid grid-cols-1 gap-4">
-                        <input type="text" name="number" placeholder="Number" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
+                        <input type="text" name="number" placeholder="Number" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={number} onChange={(e)=>setNumber(e.target.value)} />
                         <input type="text" name="created" placeholder="Created" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
                         <input type="text" name="country_of_request" placeholder="Country of request" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
                         <input type="text" name="assignment_group" placeholder="Assignment group" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />

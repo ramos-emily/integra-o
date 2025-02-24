@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-!0bpcu14qs=ep9(bc5inlp^292y)j*$_tp)nh(!97%p(#lajj1
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173/*"]
 
 # Application definition
 
@@ -42,15 +42,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework_simplejwt',
    
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -59,11 +66,11 @@ MIDDLEWARE = [
 # Permita todas as origens (apenas para desenvolvimento)
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Ou permita apenas o front-end (React)
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:5173',
-    "http://localhost:5173", # URL do front-end (Vite)
-]
+# # Ou permita apenas o front-end (React)
+# CORS_ALLOWED_ORIGINS = [
+#     'http://127.0.0.1:5173',
+#     "http://localhost:5173", # URL do front-end (Vite)
+# ]
 
 ROOT_URLCONF = 'score.urls'
 

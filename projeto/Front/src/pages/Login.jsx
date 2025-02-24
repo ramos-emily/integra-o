@@ -1,23 +1,40 @@
-import React from "react";
+import React, {useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import img from "../componentes/imagens/bosch_logo.png"; // Importe a imagem aqui
 import logo from "../componentes/imagens/logo.png";
+import axios from "axios";
 
 
 
 export default function Login() {
-    const navigate = useNavigate();
+    const [edv, setEdv] = useState("");
+    const [password, setPassword] = useState("");
+    const [ token, setToken] = useState('')
+    const navigate = useNavigate()
 
-    const handleLogin = (e) => {
-        e.preventDefault();  // Evita o comportamento padrão do formulário
-        // Adicione a lógica de autenticação aqui
-        navigate("/home");  // Redireciona para a página inicial após o login
-    };
+    const logar = async () => {
+        console.log("User: ", edv);
+        console.log("Pass: ", password);
+    
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+                username: edv,
+                password: password
+            });
+            // token 
+            localStorage.setItem('token', response.data.access);
+            console.log("Token: ", response.data.access);
+            setToken(response.data.access);
+            navigate('/quality')
 
-    const handleVoltar = (e) => {
-        e.preventDefault();  // Evita o comportamento padrão do formulário
-        navigate("/");  // Redireciona para a página inicial
+            } catch (error) {
+            console.log("Erro ao fazer login:", error.response || error);
+        }
+        console.log("XXXXXXXXXXXX", token)
     };
+    
+
+    
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-200">
@@ -38,12 +55,13 @@ export default function Login() {
 
                 <h2 className="text-2xl font-medium mb-6 text-center">LOGIN</h2>
 
-                <form onSubmit={handleLogin}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm mb-1">EDV</label>
                         <input
                             type="text"
                             className="w-full px-2 py-1 border-b border-gray-400 focus:outline-none focus:border-blue-500"
+                            onChange={(event) => setEdv(event.target.value)}
+                            value={edv}
                         />
                     </div>
 
@@ -52,13 +70,15 @@ export default function Login() {
                         <input
                             type="password"
                             className="w-full px-2 py-1 border-b border-gray-400 focus:outline-none focus:border-blue-500"
+                            onChange={(event) => setPassword(event.target.value)}
+                            value={password}
                         />
                     </div>
 
                     <div className="flex space-x-4">
                         <button
                             type="button"  // Botão de voltar não deve ser do tipo "submit"
-                            onClick={handleVoltar}
+                            // onClick={handleVoltar}
                             className="w-44 h-11 rounded-sm cursor-pointer bg-[#C088C9] shadow-xl text-white font-bold py-2 hover:bg-[#D6B3DC]"
                         >
                             VOLTAR
@@ -67,11 +87,11 @@ export default function Login() {
                         <button
                             type="submit"  // Botão de login deve ser do tipo "submit"
                             className="w-44 rounded-sm h-11 cursor-pointer bg-[#4BB25A] shadow-xl text-white font-bold py-2 hover:bg-[#86C28F]"
+                            onClick={logar}
                         >
                             ENTRAR
                         </button>
                     </div>
-                </form>
             </div>
         </div>
     );

@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,6 +13,8 @@ from .forms import FormularioForm
 from django.db.models import Avg
 import pandas as pd
 from .ai import sugerir_treinamentos, prever_erros_futuros
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class FormularioViewSet(viewsets.ModelViewSet):
     queryset = Formulario.objects.all()
@@ -24,10 +27,13 @@ class FormularioViewSet(viewsets.ModelViewSet):
 class ChecklistItemViewSet(viewsets.ModelViewSet):
     queryset = ChecklistItem.objects.all()
     serializer_class = ChecklistItemSerializer
+    permissions_class = [IsAuthenticated]
 
 class CSVFileViewSet(viewsets.ModelViewSet):
     queryset = CSVFile.objects.all()
     serializer_class = CSVFileSerializer
+
+
 # Views normais para funcionalidades personalizadas
 def analise_view(request):
     # Chama as funções de IA
@@ -174,3 +180,46 @@ def rendimento_equipe(request):
 @login_required
 def minha_view_protegida(request):
     return render(request, 'protegida.html')
+
+
+@csrf_exempt
+def quality_form_submit(request):
+    if request.method == 'POST':
+        try:
+            # Recebe os dados do frontend
+            data = json.loads(request.body)
+            
+            # Cria um novo formulário com os dados recebidos
+            formulario = Formulario.objects.create(
+                number=data.get('number'),
+                created=data.get('created'),
+                country_of_request=data.get('country_of_request'),
+                assignment_group=data.get('assignment_group'),
+                assigned_to=data.get('assigned_to'),
+                state=data.get('state'),
+                channel=data.get('channel'),
+                additional_comments=data.get('additional_comments')
+            )
+
+            # Adiciona os itens do checklist ao formulário
+            for item in data.get('format', []):
+                checklist_item, created = ChecklistItem.objects.get_or_create(descricao=item)
+                formulario.checklist.add(checklist_item)
+
+            for item in data.get('checks_and_handling', []):
+                checklist_item, created = ChecklistItem.objects.get_or_create(descricao=item)
+                formulario.checklist.add(checklist_item)
+
+            for item in data.get('taxonomy', []):
+                checklist_item, created = ChecklistItem.objects.get_or_create(descricao=item)
+                formulario.checklist.add(checklist_item)
+
+            # Atualiza o percentual de conclusão
+            formulario.atualizar_percentual_conclusao()
+
+            # Retorna uma resposta de sucesso
+            return JsonResponse({'status': 'success', 'message': 'Formulário salvo com sucesso!'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
