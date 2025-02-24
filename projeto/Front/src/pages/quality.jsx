@@ -20,50 +20,25 @@ export default function Quality() {
         checks_and_handling: [],
         taxonomy: []
     });
-    const [number, setNumber] = useState('')
-    const [created, setCreated] = useState('')
-    const [country_of_request, setCountry_of_request] = useState('')
-    const [assignment_group, setAssignment_group] = useState('')
-    const [assigned_to, setAssigned_to] = useState('')
-    const [state, setState] = useState('')
-    const [channel, setChannel] = useState('')
-    const [additional_comments, setAdditional_comments] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const token = localStorage.getItem('token')
 
-    
-//VER AQUIIIIII!!!!!!!!
+    const token = localStorage.getItem('token');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
-            const response = await axios.post('http://localhost:8000/api/quality-form/', 
-            {
-                number: number,
-                created: created,
-                country_of_request: country_of_request,
-                assignment_group: assignment_group,
-                assigned_to: assigned_to,
-                state: state,
-                channel: channel,
-                additional_comments: additional_comments,
-            },
-            {
+            const response = await axios.post('http://localhost:8000/api/quality-form/', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-    
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Resposta do backend:', data);
+
+            if (response.status === 200 || response.status === 201) {
+                console.log('Resposta do backend:', response.data);
                 alert('Formulário enviado com sucesso!');
             } else {
-                const errorData = await response.json();
-                console.error('Erro ao enviar dados:', errorData.message);
-                alert('Erro ao enviar formulário: ' + errorData.message);
+                console.error('Erro ao enviar dados:', response.data);
+                alert('Erro ao enviar formulário: ' + response.data.message);
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
@@ -91,6 +66,7 @@ export default function Quality() {
             };
         });
     };
+
     return (
         <>
             <Header />
@@ -98,34 +74,16 @@ export default function Quality() {
                 <h1 className="mb-10">Quality Check</h1>
                 <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded-md w-full">
                     <div className="grid grid-cols-1 gap-4">
-                        <input type="text" name="number" placeholder="Number" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={number} onChange={(e)=>setNumber(e.target.value)} />
-                        <input type="text" name="created" placeholder="Created" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={created} onChange={(e)=>setCreated(e.target.value)} />
-                        <input type="text" name="country_of_request" placeholder="Country of request" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={country_of_request} onChange={(e)=>setCountry_of_request(e.target.value)}  />
-                        <input type="text" name="assignment_group" placeholder="Assignment group" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={assignment_group} onChange={(e)=>setAssignment_group(e.target.value)}  />
-                        <input type="text" name="assigned_to" placeholder="Assigned to" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none"value={assigned_to} onChange={(e)=>setAssigned_to(e.target.value)}  />
-                        <input type="text" name="state" placeholder="State" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={state} onChange={(e)=>setState(e.target.value)} />
-                        <input type="text" name="channel" placeholder="Channel" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={channel} onChange={(e)=>setChannel(e.target.value)} />
+                        <input type="text" name="number" placeholder="Number" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.number} onChange={handleChange} />
+                        <input type="text" name="created" placeholder="Created" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.created} onChange={handleChange} />
+                        <input type="text" name="country_of_request" placeholder="Country of request" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.country_of_request} onChange={handleChange} />
+                        <input type="text" name="assignment_group" placeholder="Assignment group" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.assignment_group} onChange={handleChange} />
+                        <input type="text" name="assigned_to" placeholder="Assigned to" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.assigned_to} onChange={handleChange} />
+                        <input type="text" name="state" placeholder="State" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.state} onChange={handleChange} />
+                        <input type="text" name="channel" placeholder="Channel" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.channel} onChange={handleChange} />
                     </div>
-                    <textarea name="additional_comments" placeholder="Additional comments" className="w-full border border-gray-300 p-2 rounded mt-4 mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none"  value={additional_comments} onChange={(e)=>setAdditional_comments(e.target.value)} />
-
-                    <div className="mt-4 flex space-x-2">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/")}
-                            className="w-44 h-11 rounded-xs cursor-pointer bg-[#C088C9] shadow-xl text-white py-2 hover:bg-[#D6B3DC]"
-                        >
-                            Previous Record
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => navigate("/")}
-                            className="w-44 rounded-xs h-11 cursor-pointer bg-[#4BB25A] shadow-xl text-white py-2 hover:bg-[#86C28F]"
-                        >
-                            Back to Date Range
-                        </button>
-                    </div>
-                </form>
+                    <textarea name="additional_comments" placeholder="Additional comments" className="w-full border border-gray-300 p-2 rounded mt-4 mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={formData.additional_comments} onChange={handleChange} />                    
+               
 
                 {/* Seções de checkboxes */}
                 <div className="mt-15 p-4 shadow-lg rounded-md">
@@ -166,6 +124,16 @@ export default function Quality() {
                         ))}
                     </div>
                 </div>
+                 {/* Novo botão de enviar */}
+                 <div className="mt-10 flex justify-center space-x-4">
+                        <button
+                            type="submit"
+                            className="w-44 h-11 rounded-xs cursor-pointer bg-[#4BB25A] shadow-xl text-white py-2 hover:bg-[#86C28F]"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </form>
             </div>
 
             <Footer />
