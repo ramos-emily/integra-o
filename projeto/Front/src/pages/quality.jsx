@@ -21,13 +21,13 @@ export default function Quality() {
         taxonomy: []
     });
     const [number, setNumber] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
-    const [,] = useState('')
+    const [created, setCreated] = useState('')
+    const [country_of_request, setCountry_of_request] = useState('')
+    const [assignment_group, setAssignment_group] = useState('')
+    const [assigned_to, setAssigned_to] = useState('')
+    const [state, setState] = useState('')
+    const [channel, setChannel] = useState('')
+    const [additional_comments, setAdditional_comments] = useState('')
     const [,] = useState('')
     const [,] = useState('')
     const token = localStorage.getItem('token')
@@ -42,13 +42,13 @@ export default function Quality() {
             const response = await axios.post('http://localhost:8000/api/quality-form/', 
             {
                 number: number,
-                created= created,
-                country_of_request=data.get('country_of_request'),
-                assignment_group=data.get('assignment_group'),
-                assigned_to=data.get('assigned_to'),
-                state=data.get('state'),
-                channel=data.get('channel'),
-                additional_comments=data.get('additional_comments')
+                created: created,
+                country_of_request: country_of_request,
+                assignment_group: assignment_group,
+                assigned_to: assigned_to,
+                state: state,
+                channel: channel,
+                additional_comments: additional_comments,
             },
             {
                 headers: {
@@ -99,14 +99,14 @@ export default function Quality() {
                 <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded-md w-full">
                     <div className="grid grid-cols-1 gap-4">
                         <input type="text" name="number" placeholder="Number" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={number} onChange={(e)=>setNumber(e.target.value)} />
-                        <input type="text" name="created" placeholder="Created" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
-                        <input type="text" name="country_of_request" placeholder="Country of request" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
-                        <input type="text" name="assignment_group" placeholder="Assignment group" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
-                        <input type="text" name="assigned_to" placeholder="Assigned to" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
-                        <input type="text" name="state" placeholder="State" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
-                        <input type="text" name="channel" placeholder="Channel" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange} />
+                        <input type="text" name="created" placeholder="Created" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={created} onChange={(e)=>setCreated(e.target.value)} />
+                        <input type="text" name="country_of_request" placeholder="Country of request" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={country_of_request} onChange={(e)=>setCountry_of_request(e.target.value)}  />
+                        <input type="text" name="assignment_group" placeholder="Assignment group" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={assignment_group} onChange={(e)=>setAssignment_group(e.target.value)}  />
+                        <input type="text" name="assigned_to" placeholder="Assigned to" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none"value={assigned_to} onChange={(e)=>setAssigned_to(e.target.value)}  />
+                        <input type="text" name="state" placeholder="State" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={state} onChange={(e)=>setState(e.target.value)} />
+                        <input type="text" name="channel" placeholder="Channel" className="border border-gray-300 p-2 rounded mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" value={channel} onChange={(e)=>setChannel(e.target.value)} />
                     </div>
-                    <textarea name="additional_comments" placeholder="Additional comments" className="w-full border border-gray-300 p-2 rounded mt-4 mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none" onChange={handleChange}></textarea>
+                    <textarea name="additional_comments" placeholder="Additional comments" className="w-full border border-gray-300 p-2 rounded mt-4 mb-4 hover:border-gray-600 focus:border-gray-600 focus:outline-none"  value={additional_comments} onChange={(e)=>setAdditional_comments(e.target.value)} />
 
                     <div className="mt-4 flex space-x-2">
                         <button
