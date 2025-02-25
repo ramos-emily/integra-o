@@ -35,14 +35,11 @@ export default function Quality() {
 
             if (response.status === 200 || response.status === 201) {
                 console.log('Resposta do backend:', response.data);
-                alert('Formulário enviado com sucesso!');
             } else {
                 console.error('Erro ao enviar dados:', response.data);
-                alert('Erro ao enviar formulário: ' + response.data.message);
             }
         } catch (error) {
             console.error('Erro na requisição:', error);
-            alert('Erro na requisição: ' + error.message);
         }
     };
 

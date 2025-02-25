@@ -6,6 +6,22 @@ import logo from "../componentes/imagens/logo.png";
 
 export default function Header() {
     const navigate = useNavigate(); // Hook para navegação
+    // Função para verificar se o usuário é um administrador
+    const isAdmin = () => {
+        // Exemplo de como verificar se o usuário está autenticado e é administrador
+        // Você pode substituir isso por uma verificação real com base no que estiver usando (localStorage, context API, etc.)
+        const userRole = localStorage.getItem("userRole");  // Aqui, você pode salvar o papel do usuário no localStorage ou contexto
+        return userRole === 'admin'; // Retorne true se o usuário for admin
+    };
+
+    // Função para navegação para a página "Quality Check" com verificação de permissão
+    const handleNavigateToQualityCheck = () => {
+        if (isAdmin()) {
+            navigate("/quality"); // Se for admin, vai para "Quality Check"
+        } else {
+            navigate("/login"); // Caso contrário, redireciona para a página de login
+        }
+    };
 
     return (
         <header className="w-full borde-b shadow-sm fixed top-0 left-0 bg-white z-50">
@@ -35,8 +51,8 @@ export default function Header() {
                         <span className="hover:text-green-600">SOBRE NÓS</span>
                         <div className="w-full h-1 bg-green-500 scale-x-0 group-hover:scale-x-100 transition-transform"></div>
                     </li>
-                    <li className="relative group cursor-pointer" onClick={() => navigate("/login")}>
-                        <span className="hover:text-blue-600">LOGIN</span>
+                    <li className="relative group cursor-pointer" onClick={() => navigate("/Signup")}>
+                        <span className="hover:text-blue-600">CADASTRO</span>
                         <div className="w-full h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform"></div>
                     </li>
                 </ul>

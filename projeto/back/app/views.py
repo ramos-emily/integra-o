@@ -15,6 +15,7 @@ import pandas as pd
 from .ai import sugerir_treinamentos, prever_erros_futuros
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.models import User
 
 class FormularioViewSet(viewsets.ModelViewSet):
     queryset = Formulario.objects.all()
@@ -79,35 +80,48 @@ def home(request):
     return HttpResponse("Bem-vindo à página inicial!")
 
 # Cadastro de usuário
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+        try:
+            # Recebe os dados do front-end
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
 
+            # Verifica se o usuário já existe
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({'status': 'error', 'message': 'Usuário já cadastrado.'}, status=400)
+
+            # Cria o novo usuário
+            user = User.objects.create_user(username=username, password=password)
+            user.save()
+
+            # Retorna uma resposta de sucesso
+            return JsonResponse({'status': 'success', 'message': 'Usuário criado com sucesso!'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Dados inválidos. Envie um JSON válido.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido.'}, status=405)
 # Login de usuário
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                return redirect('home')
+        # Recebe o body da requisição
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+
+        # Tenta autenticar
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'status': 'success', 'message': 'Usuário autenticado com sucesso!'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Credenciais inválidas'}, status=400)
     else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 # Logout de usuário
 def user_logout(request):
