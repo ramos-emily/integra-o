@@ -80,48 +80,47 @@ def home(request):
     return HttpResponse("Bem-vindo à página inicial!")
 
 # Cadastro de usuário
-@csrf_exempt
+
+
+# Login de usuário
+def user_login(request):
+    if request.method == 'POST':
+        # Verifica se uma chave de acesso foi enviada
+        data = json.loads(request.body)
+        access_key = data.get('access_key')
+
+        # Chave de acesso fixa (apenas para exemplo)
+        if access_key == 'minha_chave_secreta':
+            return JsonResponse({'status': 'success', 'message': 'Login realizado com sucesso!'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Chave de acesso inválida'}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
+
+
 def signup(request):
     if request.method == 'POST':
         try:
-            # Recebe os dados do front-end
             data = json.loads(request.body)
             username = data.get('username')
             password = data.get('password')
 
-            # Verifica se o usuário já existe
+            if not username or not password:
+                return JsonResponse({'status': 'error', 'message': 'Usuário e senha são obrigatórios.'}, status=400)
+
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'status': 'error', 'message': 'Usuário já cadastrado.'}, status=400)
 
-            # Cria o novo usuário
             user = User.objects.create_user(username=username, password=password)
             user.save()
 
-            # Retorna uma resposta de sucesso
             return JsonResponse({'status': 'success', 'message': 'Usuário criado com sucesso!'})
         except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Dados inválidos. Envie um JSON válido.'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Erro no formato JSON.'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
         return JsonResponse({'status': 'error', 'message': 'Método não permitido.'}, status=405)
-# Login de usuário
-def user_login(request):
-    if request.method == 'POST':
-        # Recebe o body da requisição
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
-
-        # Tenta autenticar
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({'status': 'success', 'message': 'Usuário autenticado com sucesso!'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Credenciais inválidas'}, status=400)
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 # Logout de usuário
 def user_logout(request):

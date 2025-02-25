@@ -1,71 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { createFormulario, getChecklistItens } from '../api/api';
+import axios from 'axios';
 
-const QualityForm = () => {
-    const [formulario, setFormulario] = useState({
-        nome: '',
-        checklist: [],
-    });
-
-    const [checklistItens, setChecklistItens] = useState([]);
-
-    useEffect(() => {
-        // Buscar os itens do checklist ao carregar a página
-        getChecklistItens().then(response => {
-            setChecklistItens(response.data);
-        }).catch(error => console.error("Erro ao buscar checklist:", error));
-    }, []);
-
-    const handleChange = (e) => {
-        setFormulario({ ...formulario, [e.target.name]: e.target.value });
-    };
-
-    const handleChecklistChange = (e, itemId) => {
-        setFormulario(prevFormulario => {
-            const updatedChecklist = prevFormulario.checklist.includes(itemId)
-                ? prevFormulario.checklist.filter(id => id !== itemId) // Remove se já estiver marcado
-                : [...prevFormulario.checklist, itemId]; // Adiciona se não estiver marcado
-
-            return { ...prevFormulario, checklist: updatedChecklist };
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await createFormulario(formulario);
-            console.log("Formulário criado com sucesso:", response);
-        } catch (error) {
-            console.error("Erro ao enviar formulário:", error);
+// Função para enviar o formulário com o token JWT
+const createFormulario = async (formularioData) => {
+    try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            throw new Error("Token não encontrado. O usuário precisa estar logado.");
         }
-    };
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                name="nome"
-                value={formulario.nome}
-                onChange={handleChange}
-                placeholder="Nome do Formulário"
-                required
-            />
+        const response = await axios.post(
+            'http://127.0.0.1:8000/api/formulario/', 
+            formularioData, 
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
 
-            <h3>Checklist</h3>
-            {checklistItens.map((item) => (
-                <div key={item.id}>
-                    <input
-                        type="checkbox"
-                        checked={formulario.checklist.includes(item.id)}
-                        onChange={(e) => handleChecklistChange(e, item.id)}
-                    />
-                    <label>{item.descricao}</label>
-                </div>
-            ))}
-
-            <button type="submit">Enviar</button>
-        </form>
-    );
+        console.log("Formulário criado com sucesso:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao criar o formulário:", error.response || error);
+        throw error;
+    }
 };
 
-export default QualityForm;
+// Função para obter os itens de checklist
+const getChecklistItens = async () => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/checklistitens/');
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao buscar checklist:", error);
+        throw error;
+    }
+};
+
+export { createFormulario, getChecklistItens };

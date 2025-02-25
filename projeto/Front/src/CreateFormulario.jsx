@@ -9,7 +9,7 @@ const CreateFormulario = () => {
         try {
             await createFormulario({ nome });  // Faz a requisição POST
             alert('Formulário criado com sucesso!');
-            setNome('');
+            setNome(''); // Limpa o campo após o envio
         } catch (error) {
             console.error('Erro ao criar formulário:', error);
         }

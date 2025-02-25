@@ -1,16 +1,16 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem('token'); // Verifica se o token existe
-    const location = useLocation();
+    // Verifica se há um token no localStorage
+    const token = localStorage.getItem('token');
 
-    // Se não houver token, redireciona para login e guarda a página original
+    // Se não houver token, redireciona para a página de login
     if (!token) {
-        console.log("Usuário não autenticado. Redirecionando para login...");
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
+    // Se houver token, renderiza o componente filho (página protegida)
     return children;
 };
 

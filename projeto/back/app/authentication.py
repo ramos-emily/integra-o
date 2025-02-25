@@ -6,7 +6,7 @@ User = get_user_model()
 class EDVAuthenticationBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
-            user = User.objects.get(edv=username)  # Usa EDV ao invés de username
+            user = User.objects.get(username=username)  # Usa EDV ao invés de username
             if user.check_password(password):
                 return user
         except User.DoesNotExist:

@@ -15,11 +15,11 @@ export default function Login() {
     
         try {
             // Verifique se a URL está correta para a autenticação JWT
-            const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+            const response = await axios.post('http://127.0.0.1:8000/login/', {
                 username: edv,  // username (EDV)
                 password: password // senha
             });
-    
+
             // Salva o token no localStorage
             localStorage.setItem('token', response.data.access);
             console.log("Token salvo no localStorage:", response.data.access);
@@ -30,6 +30,7 @@ export default function Login() {
         } catch (error) {
             console.log("Erro ao fazer login:", error.response || error);
             alert("Erro ao fazer login. Verifique suas credenciais.");
+            console.log("Token salvo no localStorage:", localStorage.getItem('token'));
         }
     };
 
